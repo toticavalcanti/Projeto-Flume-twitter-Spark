@@ -1,0 +1,40 @@
+Passo a passo
+
+1 - Criar o diretório:
+mkdir -p /usr/lib/flume-ng/plugins.d/twitter-streaming/lib/
+
+2 - Criar o diretório:
+mkdir -p /var/lib/flume-ng/plugins.d/twitter-streaming/lib/
+
+3 - Colocar o arquivo flume-sources-1.0-SNAPSHOT.jar nos diretórios criados anteriormente, para isso, você deve estar dentro da pasta está tem o flume-sources-1.0-SNAPSHOT.jar, no meu caso eu tô na pasta /datasets/ e dentro dela tem o flume-sources-1.0-SNAPSHOT.jar que foi feito o build a partir do repositório do Gihub que indiquei: https://github.com/cloudera/cdh-twitter-example:
+
+Copiar para:
+cp flume-sources-1.0-SNAPSHOT.jar /usr/lib/flume-ng/plugins.d/twitter-streaming/lib/
+
+Copiar também para:
+cp /var/lib/flume-ng/plugins.d/twitter-streaming/lib/
+
+4 - Copie para a pasta /etc/flume-ng/conf.empty o arquivo de configuração do Flume para a app do twitter: twitter-flume.conf, se você já tiver na pasta onde ele está é só usar:
+cp twitter-flume.conf /etc/flume-ng/conf.empty/
+
+5 - Antes de rodar o agente, crie a pasta no HDFS que você configurou no twitter-flume.conf, para o agente colocar os arquivos coletados:
+
+hadoop fs -mkdir -p /user/flume/tweets
+
+6 - Agora é só rodar o agente flume pra pegar os arquivos do twitter, para isso entre na pasta /etc/flume-ng/conf.empty com o comando:
+cd /etc/flume-ng/conf.empty/
+
+Agora digite o comando para iniciar o agente:
+flume-ng agent -n TwitterAgent -c conf -f /etc/flume-ng/conf.empty/twitter-flume.conf -Dflume.root.logger=DEBUG,console -n TwitterAgent
+
+6 - O agente vai começar a coletar os dados, depois você poderá ver os arquivos gerados no HDFS usando:
+hadoop fs -get /user/flume/tweets/2018/03/29/11/FlumeData.1522349293383
+
+Perceba que ele gera arquivos por pastas separadas por data %Y/%m/%d/%H/ como configurado no agente.
+
+
+
+
+
+
+
