@@ -44,7 +44,6 @@ filenameAFINN = "/home/training/TwitterSentimentAnalysis/AFINN/AFINN-111.txt"
 # map applies the lambda function (create a tuple of word and sentiment score) to every item of iterable
 # within [ ] and returns a list of results. The dictionary is used here to be able to quickly lookup the
 # sentiment score based on the key value 
-#afinn = dict(map(lambda (w, s): (w, int(s)), [ ws.strip().split('\t') for ws in open(filenameAFINN) ]))
 f = open(filenameAFINN, "r")
 texto = f.readlines()
 afinn = {}
@@ -59,15 +58,11 @@ f.close()
 
 
 # Read in the candidate mapping list and create a static dictionary from it
-filenameCandidate = "file:///home/training/TwitterSentimentAnalysis/Candidates/Candidate/Mapping.txt"
+filenameCandidate = "file:///home/training/TwitterSentimentAnalysis/Candidates/Candidate_Mapping.txt"
 
 # map applies the lambda function
-#candidates = sc.textFile(filenameCandidate).map(lambda x: (x.strip().split(",")[0],x.strip().split(","))) \
-                         #.flatMapValues(lambda x:x).map(lambda y: (y[1],y[0])).distinct()
-candidates = ['LuizInacioLuladaSilva', 'Luiz Inacio Lula da Silva', 'Luiz Inácio Lula da Silva',
-'LuizInácioLuladaSilva', 'lula', 'lula 2018', 'JairBolsonaro', 'Jair Bolsonaro', 'Bolsonaro', 
-'CiroGomes', 'Ciro Gomes', 'GeraldoAlckmin', 'Geraldo Alckmin', 'Alckmin', 'Alckmin 2018']
-print(candidates)
+candidates = sc.textFile(filenameCandidate).map(lambda x: (x.strip().split(",")[0],x.strip().split(","))) \
+                         .flatMapValues(lambda x:x).map(lambda y: (y[1],y[0])).distinct()
 
 # word splitter pattern
 pattern_split = re.compile(r"\W+")
@@ -95,7 +90,8 @@ sentimentTuple = tweets.rdd.map(lambda r: [r.id, r.text, r.name]) \
                .map(lambda y: (y[1],y[0])) \
                .reduceByKey(lambda x, y: x+y) \
                .sortByKey(ascending=True)
-
+for t in sentimentTuple.collect():
+    print(t)
 scoreDF = sentimentTuple.join(candidates) \
             .map(lambda (x, y): (y[1],y[0])) \
             .reduceByKey(lambda a, b: a + b) \
